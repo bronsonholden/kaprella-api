@@ -1,6 +1,4 @@
 class Api::V1::LicenseesController < ApplicationController
-  before_action :set_licensee, only: [:show, :update, :destroy]
-
   # GET /licensees
   def index
     render json: {}, status: :ok
