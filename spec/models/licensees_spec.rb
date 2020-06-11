@@ -29,5 +29,14 @@ RSpec.describe Licensee, type: :model do
       let(:account_id) { 12345 }
       include_examples 'valid_account_number'
     end
+
+    # If no account ID is assigned, the returned Account Number should not
+    # be a lone 'A', but should just be nil.
+    context 'blank account_id' do
+      let(:licensee) { build :licensee, account_id: nil }
+      it 'account_number returns nil' do
+        expect(licensee.account_number).to be_nil
+      end
+    end
   end
 end

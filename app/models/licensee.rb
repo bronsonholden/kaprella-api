@@ -9,6 +9,8 @@ class Licensee < ApplicationRecord
   # The account number uniquely identifies a Licensee, but historically it is
   # formatted with a prefixed 'A'.
   def account_number
-    "A%04d" % account_id
+    if !account_id.nil?
+      "A%04d" % account_id
+    end
   end
 end
