@@ -3,6 +3,7 @@
 class Licensee < ApplicationRecord
   validates :name, presence: true
   validates :account_id, uniqueness: true, presence: true
+  validates :country, presence: true
   auto_increment :account_id, initial: 3000, before: :validation, lock: true
 
   # The account number uniquely identifies a Licensee, but historically it is
