@@ -102,4 +102,7 @@ Rails.application.configure do
   # config.active_record.database_selector = { delay: 2.seconds }
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+
+  Rails.application.routes.default_url_options[:host] = 'api.kaprella.com'
+  Rails.application.routes.default_url_options[:protocol] = 'https'
 end

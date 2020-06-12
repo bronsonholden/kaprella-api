@@ -50,6 +50,8 @@ gem 'activerecord-postgis-adapter'
 # tzinfo is already included as part of Rails dependencies
 gem 'countries'
 gem 'money', '~> 6.9'
+gem 'jsonapi-realizer', git: 'https://github.com/paulholden2/jsonapi-realizer.rb.git', branch: 'core'
+gem 'jsonapi-serializers'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
