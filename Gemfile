@@ -52,6 +52,9 @@ gem 'countries'
 gem 'money', '~> 6.9'
 gem 'jsonapi-realizer', git: 'https://github.com/paulholden2/jsonapi-realizer.rb.git', branch: 'core'
 gem 'jsonapi-serializers'
+gem 'pundit'
+gem 'discard', '~> 1.0'
+gem 'paper_trail'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

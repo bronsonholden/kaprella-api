@@ -16,10 +16,8 @@ ActiveRecord::Schema.define(version: 2020_06_11_043826) do
   enable_extension "plpgsql"
   enable_extension "postgis"
 
-  create_table "licensees", force: :cascade do |t|
+  create_table "farmers", force: :cascade do |t|
     t.text "name", null: false
-    t.string "account_id", null: false
-    t.string "country", limit: 2, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
