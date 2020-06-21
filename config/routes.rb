@@ -5,6 +5,7 @@ Rails.application.routes.draw do
         resources :farmers
         resources :fields
         resources :licensors
+        resources :plant_varieties
       end
     end
   end
