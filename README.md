@@ -1,5 +1,8 @@
 # Kaprella API Server
 
+Kaprella connects Ag industry players, providing a unified platform to
+capture, true-up, and analyze data.
+
 ## Setup
 
 Kaprella uses the PostGIS extension for PostgreSQL. PostGIS must be installed
