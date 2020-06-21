@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_21_071217) do
+ActiveRecord::Schema.define(version: 2020_06_21_223412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,19 @@ ActiveRecord::Schema.define(version: 2020_06_21_071217) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "patents", force: :cascade do |t|
+    t.string "patent_number", null: false
+    t.text "title", null: false
+    t.date "expiration_date", null: false
+    t.text "authority", null: false
+    t.bigint "assignee_id"
+    t.bigint "subject_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["assignee_id"], name: "index_patents_on_assignee_id"
+    t.index ["subject_id"], name: "index_patents_on_subject_id", unique: true
+  end
+
   create_table "plant_varieties", force: :cascade do |t|
     t.string "genus", null: false
     t.text "denomination", null: false
@@ -47,4 +60,6 @@ ActiveRecord::Schema.define(version: 2020_06_21_071217) do
   end
 
   add_foreign_key "fields", "farmers"
+  add_foreign_key "patents", "licensors", column: "assignee_id"
+  add_foreign_key "patents", "plant_varieties", column: "subject_id"
 end
