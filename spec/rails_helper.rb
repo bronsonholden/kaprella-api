@@ -66,7 +66,8 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before(:suite) do
-    DatabaseCleaner.clean_with :truncation
+    # Exclude spatial_ref_sys table (used by PostGIS)
+    DatabaseCleaner.clean_with(:truncation, except: %w(spatial_ref_sys))
     DatabaseCleaner.strategy = :transaction
   end
 

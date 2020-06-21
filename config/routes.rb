@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     version 1 do
       cache as: 'v1' do
         resources :farmers
+        resources :fields
         resources :licensors
       end
     end
