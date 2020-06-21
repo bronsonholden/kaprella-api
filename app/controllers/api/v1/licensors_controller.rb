@@ -6,7 +6,7 @@ class Api::V1::LicensorsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
 
-  # GET /licensors/:account_id
+  # GET /licensors/:id
   def show
     scope = Licensor.all
     realizer = LicensorRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
@@ -20,7 +20,7 @@ class Api::V1::LicensorsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
-  # PATCH/PUT /licensors/:account_id
+  # PATCH/PUT /licensors/:id
   def update
     scope = Licensor.all
     realizer = LicensorRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
@@ -28,7 +28,7 @@ class Api::V1::LicensorsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
-  # DELETE /licensors/:account_id
+  # DELETE /licensors/:id
   def destroy
     scope = Licensor.all
     realizer = LicensorRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)

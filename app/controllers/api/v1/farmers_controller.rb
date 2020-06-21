@@ -6,7 +6,7 @@ class Api::V1::FarmersController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
 
-  # GET /farmers/:account_id
+  # GET /farmers/:id
   def show
     scope = Farmer.all
     realizer = FarmerRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
@@ -20,7 +20,7 @@ class Api::V1::FarmersController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
-  # PATCH/PUT /farmers/:account_id
+  # PATCH/PUT /farmers/:id
   def update
     scope = Farmer.all
     realizer = FarmerRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
@@ -28,7 +28,7 @@ class Api::V1::FarmersController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
-  # DELETE /farmers/:account_id
+  # DELETE /farmers/:id
   def destroy
     scope = Farmer.all
     realizer = FarmerRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
