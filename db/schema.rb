@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_21_223412) do
+ActiveRecord::Schema.define(version: 2020_06_22_042616) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,7 +59,20 @@ ActiveRecord::Schema.define(version: 2020_06_21_223412) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "trademark_names", force: :cascade do |t|
+    t.string "authority", null: false
+    t.string "title", null: false
+    t.string "mark", null: false
+    t.date "grant_date", null: false
+    t.date "renewal_date", null: false
+    t.bigint "subject_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["subject_id"], name: "index_trademark_names_on_subject_id", unique: true
+  end
+
   add_foreign_key "fields", "farmers"
   add_foreign_key "patents", "licensors", column: "assignee_id"
   add_foreign_key "patents", "plant_varieties", column: "subject_id"
+  add_foreign_key "trademark_names", "plant_varieties", column: "subject_id"
 end

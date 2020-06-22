@@ -7,6 +7,7 @@ Rails.application.routes.draw do
         resources :licensors
         resources :patents
         resources :plant_varieties
+        resources :trademark_names
       end
     end
   end
