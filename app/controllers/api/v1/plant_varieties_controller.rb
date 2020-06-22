@@ -1,14 +1,14 @@
 class Api::V1::PlantVarietiesController < ApplicationController
   # GET /plant_varieties
   def index
-    scope = PlantVariety.all
+    scope = PlantVariety.with_protections
     realizer = PlantVarietyRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
 
   # GET /plant_varieties/:id
   def show
-    scope = PlantVariety.all
+    scope = PlantVariety.with_protections
     realizer = PlantVarietyRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -22,7 +22,7 @@ class Api::V1::PlantVarietiesController < ApplicationController
 
   # PATCH/PUT /plant_varieties/:id
   def update
-    scope = PlantVariety.all
+    scope = PlantVariety.with_protections
     realizer = PlantVarietyRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
@@ -30,7 +30,7 @@ class Api::V1::PlantVarietiesController < ApplicationController
 
   # DELETE /plant_varieties/:id
   def destroy
-    scope = PlantVariety.all
+    scope = PlantVariety.with_protections
     realizer = PlantVarietyRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.destroy
   end
