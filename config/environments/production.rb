@@ -38,11 +38,7 @@ Rails.application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # SSL can be optionally disabled for staging environments.
-  force_ssl = true
-  if ENV['FORCE_SSL'].present?
-    force_ssl = ENV['FORCE_SSL']
-  end
-  config.force_ssl = force_ssl
+  config.force_ssl = ENV['DISABLE_FORCE_SSL'].blank?
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
