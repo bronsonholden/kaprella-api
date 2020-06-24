@@ -13,3 +13,19 @@ for more information. Once PostGIS is installed, run the setup Rake task:
 ```
 $ rake db:gis:setup
 ```
+
+## Heroku Setup
+
+1. Create the Heroku Rails app
+
+2. Set up the PostGIS extension:
+
+   ```
+   $ heroku run -a $APP_NAME rake db:gis:setup
+   ```
+
+3. Migrate the database
+
+   ```
+   $ heroku run -a $APP_NAME rake db:migrate
+   ```
