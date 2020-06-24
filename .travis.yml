@@ -1,0 +1,14 @@
+language: ruby
+addons:
+  postgresql: 9.6
+  apt:
+    packages:
+    - postgresql-9.6-postgis-2.3
+rvm:
+  - 2.5.1
+script:
+  - bundle exec rake db:create db:gis:setup
+  - bundle exec rake db:migrate RAILS_ENV=test
+  - bundle exec rspec spec
+env:
+  - PG_USERNAME='postgres'
