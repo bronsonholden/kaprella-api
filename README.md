@@ -1,7 +1,8 @@
 # Kaprella API Server
 
-Kaprella connects Ag industry players, providing a unified platform to
-capture, true-up, and analyze data.
+Kaprella is a purpose-built Ag platform that connects players across the
+industry, providing a unified system to capture, true-up, and analyze data
+along the production chain.
 
 ## Setup
 
