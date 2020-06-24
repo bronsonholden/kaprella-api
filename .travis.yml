@@ -6,6 +6,8 @@ addons:
     - postgresql-9.6-postgis-2.3
 rvm:
   - 2.5.1
+before_install:
+  - gem install bundler
 script:
   - bundle exec rake db:create db:gis:setup
   - bundle exec rake db:migrate RAILS_ENV=test
