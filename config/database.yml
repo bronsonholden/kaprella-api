@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: kaprella_api_production
-  username: kaprella_api
-  password: <%= ENV['KAPRELLA_API_DATABASE_PASSWORD'] %>
+  url: <%= ENV.fetch('DATABASE_URL', '').sub(/^postgres/, "postgis") %>
