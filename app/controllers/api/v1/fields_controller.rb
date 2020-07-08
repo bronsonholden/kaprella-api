@@ -2,8 +2,9 @@ class Api::V1::FieldsController < ApplicationController
   # GET /fields
   def index
     scope = Field.all
-    realizer = FieldRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
+    realizer = FieldRealizer.new(intent: :index, parameters: req_params, headers: request.headers, scope: scope)
+    page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
   end
 
   # GET /fields/:id

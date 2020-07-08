@@ -3,7 +3,8 @@ class Api::V1::PlantVarietiesController < ApplicationController
   def index
     scope = PlantVariety.with_protections
     realizer = PlantVarietyRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
+    page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
   end
 
   # GET /plant_varieties/:id
