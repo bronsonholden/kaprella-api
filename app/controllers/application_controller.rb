@@ -1,5 +1,16 @@
 class ApplicationController < ActionController::API
 
+  def api
+    render json: {
+      'data' => {
+        'type' => 'api',
+        'attributes' => {
+          'version' => Api::VERSION
+        }
+      }
+    }, status: :ok
+  end
+
   protected
 
   def req_params
