@@ -12,7 +12,7 @@ require "action_mailer/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module KaprellaApi
+module Kaprella
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
@@ -28,6 +28,9 @@ module KaprellaApi
       'Access-Control-Request-Method' => %w{GET POST OPTIONS}.join(','),
       'Access-Control-Allow-Headers' => 'accept, content-type'
     }
+
+    # Load code under lib/
+    config.autoload_paths << "#{Rails.root}/lib"
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.

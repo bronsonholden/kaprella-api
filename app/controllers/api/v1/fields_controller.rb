@@ -1,15 +1,18 @@
 class Api::V1::FieldsController < ApplicationController
   # GET /fields
   def index
-    scope = Field.all
-    realizer = FieldRealizer.new(intent: :index, parameters: req_params, headers: request.headers, scope: scope)
+    scope = Field.with_area.includes(:farmer)
+    params = req_params
+    realizer_params = params.except('filter', 'sort')
+    scope = ResourceQueryService.new(params).apply(scope)
+    realizer = FieldRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, include: ['farmer'], is_collection: true, meta: page), status: :ok
   end
 
   # GET /fields/:id
   def show
-    scope = Field.all
+    scope = Field.with_area
     realizer = FieldRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -20,7 +23,7 @@ class Api::V1::FieldsController < ApplicationController
     realizer = FieldRealizer.new(intent: :create, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     # Field must be retrieved to include generated area column.
-    object = Field.all.find(realizer.object.id)
+    object = Field.with_area.find(realizer.object.id)
     render json: JSONAPI::Serializer.serialize(object), status: :created
   end
 

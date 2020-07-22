@@ -1,4 +1,10 @@
 class ApplicationController < ActionController::API
+  rescue_from Kaprella::Errors::RestrictedGeneratedColumnIdentifier, with: :api_exception
+  rescue_from Kaprella::Errors::InvalidGeneratedColumnIdentifier, with: :api_exception
+  rescue_from Kaprella::Errors::GeneratorFunctionArgumentError, with: :api_exception
+  rescue_from Kaprella::Errors::UnknownPropertyIdentifier, with: :api_exception
+  rescue_from Kaprella::Errors::InvalidFilterExpression, with: :api_exception
+  rescue_from Kaprella::Errors::InvalidSortExpression, with: :api_exception
 
   def api
     render json: {
@@ -46,5 +52,10 @@ class ApplicationController < ActionController::API
 
   def page_offset
     req_params.dig('page', 'offset')
+  end
+
+  def api_exception(exception)
+    errors = [{ title: exception.message }]
+    render json: { errors: errors }, status: exception.status
   end
 end

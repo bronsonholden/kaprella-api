@@ -7,7 +7,7 @@ class Field < ApplicationRecord
     Field.find(id)
   end
 
-  default_scope {
+  scope :with_area, -> {
     select_append(<<-SQL)
       CASE
         WHEN fields.srid IS NULL THEN
