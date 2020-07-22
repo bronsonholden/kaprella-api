@@ -1,7 +1,7 @@
 class Api::V1::FarmersController < ApplicationController
   # GET /farmers
   def index
-    scope = Farmer.all
+    scope = Farmer.all.includes(:fields)
     realizer = FarmerRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
