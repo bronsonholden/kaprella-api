@@ -27,51 +27,51 @@ RSpec.describe TrademarkName, type: :request do
     }
   }
 
-  describe 'GET /trademark_names' do
+  describe 'GET /trademark-names' do
     it 'returns trademark names' do
-      get '/trademark_names', headers: headers
+      get '/trademark-names', headers: headers
       expect(response).to have_http_status(200)
     end
   end
 
-  describe 'POST /trademark_names' do
+  describe 'POST /trademark-names' do
     let(:payload) {
       {
         data: {
-          type: 'trademark_names',
+          type: 'trademark-names',
           attributes: trademark_name_attributes,
           relationships: trademark_name_relationships
         }
       }.to_json
     }
     it 'creates trademark name' do
-      post '/trademark_names', headers: headers, params: payload
+      post '/trademark-names', headers: headers, params: payload
       expect(response).to have_http_status(201)
     end
   end
 
-  describe 'PATCH /trademark_names/:id' do
+  describe 'PATCH /trademark-names/:id' do
     let(:trademark_name) { create :trademark_name }
     let(:mark) { 'Superb-anana II' }
     let(:payload) {
       {
         data: {
           id: trademark_name.id,
-          type: 'trademark_names',
+          type: 'trademark-names',
           attributes: trademark_name_attributes
         }
       }.to_json
     }
     it 'updates trademark name' do
-      patch "/trademark_names/#{trademark_name.id}", headers: headers, params: payload
+      patch "/trademark-names/#{trademark_name.id}", headers: headers, params: payload
       expect(response).to have_http_status(200)
     end
   end
 
-  describe 'DELETE /trademark_names/:id' do
+  describe 'DELETE /trademark-names/:id' do
     let(:trademark_name) { create :trademark_name }
     it 'updates trademark name' do
-      delete "/trademark_names/#{trademark_name.id}", headers: headers
+      delete "/trademark-names/#{trademark_name.id}", headers: headers
       expect(response).to have_http_status(204)
       expect(TrademarkName.all.size).to eq(0)
     end

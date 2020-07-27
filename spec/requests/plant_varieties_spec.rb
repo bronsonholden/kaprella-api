@@ -10,14 +10,14 @@ RSpec.describe PlantVariety, type: :request do
     }
   }
 
-  describe 'GET /plant_varieties' do
+  describe 'GET /plant-varieties' do
     it 'returns plant varieties' do
-      get '/plant_varieties', headers: headers
+      get '/plant-varieties', headers: headers
       expect(response).to have_http_status(200)
     end
   end
 
-  describe 'POST /plant_varieties' do
+  describe 'POST /plant-varieties' do
     let(:payload) {
       {
         data: {
@@ -27,7 +27,7 @@ RSpec.describe PlantVariety, type: :request do
       }.to_json
     }
     it 'creates plant variety' do
-      post '/plant_varieties', headers: headers, params: payload
+      post '/plant-varieties', headers: headers, params: payload
       expect(response).to have_http_status(201)
     end
   end
@@ -45,7 +45,7 @@ RSpec.describe PlantVariety, type: :request do
       }.to_json
     }
     it 'updates plant variety' do
-      patch "/plant_varieties/#{plant_variety.id}", headers: headers, params: payload
+      patch "/plant-varieties/#{plant_variety.id}", headers: headers, params: payload
       expect(response).to have_http_status(200)
     end
   end
@@ -53,7 +53,7 @@ RSpec.describe PlantVariety, type: :request do
   describe 'DELETE /plant-varieties/:id' do
     let(:plant_variety) { create :plant_variety }
     it 'updates plant variety' do
-      delete "/plant_varieties/#{plant_variety.id}", headers: headers
+      delete "/plant-varieties/#{plant_variety.id}", headers: headers
       expect(response).to have_http_status(204)
       expect(PlantVariety.all.size).to eq(0)
     end

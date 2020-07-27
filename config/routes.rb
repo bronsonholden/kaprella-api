@@ -7,8 +7,8 @@ Rails.application.routes.draw do
         resources :fields
         resources :licensors
         resources :patents
-        resources :plant_varieties
-        resources :trademark_names
+        resources :plant_varieties, path: 'plant-varieties'
+        resources :trademark_names, path: 'trademark-names'
       end
     end
   end
