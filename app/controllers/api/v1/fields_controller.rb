@@ -29,7 +29,7 @@ class Api::V1::FieldsController < ApplicationController
 
   # PATCH/PUT /fields/:id
   def update
-    scope = Field.all
+    scope = Field.with_area
     realizer = FieldRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
