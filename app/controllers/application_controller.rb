@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::API
+  rescue_from ActiveRecord::RecordInvalid, with: :invalid_record_exception
   rescue_from Kaprella::Errors::RestrictedGeneratedColumnIdentifier, with: :api_exception
   rescue_from Kaprella::Errors::InvalidGeneratedColumnIdentifier, with: :api_exception
   rescue_from Kaprella::Errors::GeneratorFunctionArgumentError, with: :api_exception
@@ -52,6 +53,11 @@ class ApplicationController < ActionController::API
 
   def page_offset
     req_params.dig('page', 'offset')
+  end
+
+  def invalid_record_exception(exception)
+    errors = [{ title: exception.message }]
+    render json: { errors: errors }, status: :unprocessable_entity
   end
 
   def api_exception(exception)
