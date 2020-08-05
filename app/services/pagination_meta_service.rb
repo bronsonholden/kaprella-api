@@ -10,10 +10,10 @@ class PaginationMetaService
 
   def generate
     {
-      'page-offset' => @page_offset,
-      'page-limit' => @page_limit,
-      'item-count' => @item_count,
-      'total-pages' => @total_pages
+      'pageOffset' => @page_offset,
+      'pageLimit' => @page_limit,
+      'itemCount' => @item_count,
+      'totalPages' => @total_pages
     }
   end
 end
