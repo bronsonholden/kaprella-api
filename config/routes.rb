@@ -3,12 +3,16 @@ Rails.application.routes.draw do
   api vendor_string: 'kaprella', default_version: 1, path: '' do
     version 1 do
       cache as: 'v1' do
-        resources :farmers
-        resources :fields
-        resources :licensors
-        resources :patents
-        resources :plant_varieties, path: 'plant-varieties'
-        resources :trademark_names, path: 'trademark-names'
+        [
+          :farmers,
+          :fields,
+          :licensors,
+          :patents,
+          :plant_varieties,
+          :trademark_names
+        ].each { |resource|
+          resources resource, path: resource.to_s.camelize(:lower)
+        }
       end
     end
   end
