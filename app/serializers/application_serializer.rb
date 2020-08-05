@@ -19,6 +19,10 @@ class ApplicationSerializer
     end
   end
 
+  def type
+    object.model_name.plural.camelize(:lower)
+  end
+
   def format_name(attribute)
     attribute.to_s.camelize(:lower)
   end

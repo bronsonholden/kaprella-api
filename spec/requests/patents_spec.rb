@@ -26,7 +26,7 @@ RSpec.describe Patent, type: :request do
       subject: {
         data: {
           id: plant_variety.id,
-          type: 'plant-varieties'
+          type: 'plantVarieties'
         }
       }
     }

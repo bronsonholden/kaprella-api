@@ -21,57 +21,57 @@ RSpec.describe TrademarkName, type: :request do
       subject: {
         data: {
           id: plant_variety.id,
-          type: 'plant-varieties'
+          type: 'plantVarieties'
         }
       }
     }
   }
 
-  describe 'GET /trademark-names' do
+  describe 'GET /trademarkNames' do
     it 'returns trademark names' do
-      get '/trademark-names', headers: headers
+      get '/trademarkNames', headers: headers
       expect(response).to have_http_status(200)
     end
   end
 
-  describe 'POST /trademark-names' do
+  describe 'POST /trademarkNames' do
     let(:payload) {
       {
         data: {
-          type: 'trademark-names',
+          type: 'trademarkNames',
           attributes: trademark_name_attributes,
           relationships: trademark_name_relationships
         }
       }.to_json
     }
     it 'creates trademark name' do
-      post '/trademark-names', headers: headers, params: payload
+      post '/trademarkNames', headers: headers, params: payload
       expect(response).to have_http_status(201)
     end
   end
 
-  describe 'PATCH /trademark-names/:id' do
+  describe 'PATCH /trademarkNames/:id' do
     let(:trademark_name) { create :trademark_name }
     let(:mark) { 'Superb-anana II' }
     let(:payload) {
       {
         data: {
           id: trademark_name.id,
-          type: 'trademark-names',
+          type: 'trademarkNames',
           attributes: trademark_name_attributes
         }
       }.to_json
     }
     it 'updates trademark name' do
-      patch "/trademark-names/#{trademark_name.id}", headers: headers, params: payload
+      patch "/trademarkNames/#{trademark_name.id}", headers: headers, params: payload
       expect(response).to have_http_status(200)
     end
   end
 
-  describe 'DELETE /trademark-names/:id' do
+  describe 'DELETE /trademarkNames/:id' do
     let(:trademark_name) { create :trademark_name }
     it 'updates trademark name' do
-      delete "/trademark-names/#{trademark_name.id}", headers: headers
+      delete "/trademarkNames/#{trademark_name.id}", headers: headers
       expect(response).to have_http_status(204)
       expect(TrademarkName.all.size).to eq(0)
     end
