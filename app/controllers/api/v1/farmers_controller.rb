@@ -7,7 +7,12 @@ class Api::V1::FarmersController < ApplicationController
     scope = ResourceQueryService.new(params).apply(scope)
     realizer = FarmerRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
+    reflection = ReflectionMetaService.new(Farmer.columns_hash)
+    meta = {
+      'page' => page.generate,
+      'reflection' => reflection.generate
+    }
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: meta), status: :ok
   end
 
   # GET /farmers/:id

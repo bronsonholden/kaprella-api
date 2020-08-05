@@ -2,9 +2,17 @@ class Api::V1::PlantVarietiesController < ApplicationController
   # GET /plant_varieties
   def index
     scope = PlantVariety.with_protections
-    realizer = PlantVarietyRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
+    params = req_params
+    realizer_params = params.except('filter', 'sort')
+    scope = ResourceQueryService.new(params).apply(scope)
+    realizer = PlantVarietyRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
+    reflection = ReflectionMetaService.new(PlantVariety.columns_hash)
+    meta = {
+      'page' => page.generate,
+      'reflection' => reflection.generate
+    }
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: meta), status: :ok
   end
 
   # GET /plant_varieties/:id

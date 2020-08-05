@@ -2,9 +2,17 @@ class Api::V1::TrademarkNamesController < ApplicationController
   # GET /trademark_names
   def index
     scope = TrademarkName.all
-    realizer = TrademarkNameRealizer.new(intent: :index, parameters: request.params, headers: request.headers, scope: scope)
+    params = req_params
+    realizer_params = params.except('filter', 'sort')
+    scope = ResourceQueryService.new(params).apply(scope)
+    realizer = TrademarkNameRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: page), status: :ok
+    reflection = ReflectionMetaService.new(TrademarkName.columns_hash)
+    meta = {
+      'page' => page.generate,
+      'reflection' => reflection.generate
+    }
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: meta), status: :ok
   end
 
   # GET /trademark_names/:id
