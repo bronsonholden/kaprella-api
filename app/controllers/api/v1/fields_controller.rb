@@ -1,7 +1,7 @@
 class Api::V1::FieldsController < ApplicationController
   # GET /fields
   def index
-    scope = Field.with_area.includes(:farmer)
+    scope = Field.with_geo.includes(:farmer)
     params = req_params
     realizer_params = params.except('filter', 'sort')
     scope = ResourceQueryService.new(params).apply(scope)
@@ -17,7 +17,7 @@ class Api::V1::FieldsController < ApplicationController
 
   # GET /fields/:id
   def show
-    scope = Field.with_area
+    scope = Field.with_geo
     realizer = FieldRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -28,13 +28,13 @@ class Api::V1::FieldsController < ApplicationController
     realizer = FieldRealizer.new(intent: :create, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     # Field must be retrieved to include generated area column.
-    object = Field.with_area.find(realizer.object.id)
+    object = Field.with_geo.find(realizer.object.id)
     render json: JSONAPI::Serializer.serialize(object), status: :created
   end
 
   # PATCH/PUT /fields/:id
   def update
-    scope = Field.with_area
+    scope = Field.with_geo
     realizer = FieldRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok

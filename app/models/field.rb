@@ -7,8 +7,8 @@ class Field < ApplicationRecord
     Field.find(id)
   end
 
-  scope :with_area, -> {
-    select_append(<<-SQL)
+  scope :with_geo, -> {
+    select_append(<<-SQL
       CASE
         WHEN fields.srid IS NULL THEN
           ST_Area(fields.boundary)
@@ -16,5 +16,9 @@ class Field < ApplicationRecord
           ST_Area(ST_Transform(fields.boundary::geometry, fields.srid))
       END AS "boundary_area"
     SQL
+    ).select_append(<<-SQL
+      ST_Centroid(fields.boundary) AS "centroid"
+    SQL
+    )
   }
 end

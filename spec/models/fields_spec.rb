@@ -11,6 +11,6 @@ RSpec.describe Field, type: :model do
     # The factory-returned object won't have the generated boundary area
     # column, so we have to run an ActiveRecord query that will return it
     # as part of the default scope for Fields.
-    expect(Field.with_area.find(field.id).boundary_area).to be_a(Numeric)
+    expect(Field.with_geo.find(field.id).boundary_area).to be_a(Numeric)
   end
 end
