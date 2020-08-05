@@ -7,7 +7,7 @@ class Api::V1::TrademarkNamesController < ApplicationController
     scope = ResourceQueryService.new(params).apply(scope)
     realizer = TrademarkNameRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    reflection = ReflectionMetaService.new(TrademarkName.columns_hash)
+    reflection = ReflectionMetaService.new(TrademarkName)
     meta = {
       'page' => page.generate,
       'reflection' => reflection.generate

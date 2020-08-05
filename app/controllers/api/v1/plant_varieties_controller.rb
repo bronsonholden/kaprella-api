@@ -7,7 +7,7 @@ class Api::V1::PlantVarietiesController < ApplicationController
     scope = ResourceQueryService.new(params).apply(scope)
     realizer = PlantVarietyRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    reflection = ReflectionMetaService.new(PlantVariety.columns_hash)
+    reflection = ReflectionMetaService.new(PlantVariety)
     meta = {
       'page' => page.generate,
       'reflection' => reflection.generate

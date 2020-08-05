@@ -7,7 +7,7 @@ class Api::V1::FieldsController < ApplicationController
     scope = ResourceQueryService.new(params).apply(scope)
     realizer = FieldRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    reflection = ReflectionMetaService.new(Field.columns_hash)
+    reflection = ReflectionMetaService.new(Field)
     meta = {
       'page' => page.generate,
       'reflection' => reflection.generate

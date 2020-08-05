@@ -7,7 +7,7 @@ class Api::V1::LicensorsController < ApplicationController
     scope = ResourceQueryService.new(params).apply(scope)
     realizer = LicensorRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
-    reflection = ReflectionMetaService.new(Licensor.columns_hash)
+    reflection = ReflectionMetaService.new(Licensor)
     meta = {
       'page' => page.generate,
       'reflection' => reflection.generate
