@@ -412,6 +412,12 @@ class ResourceQueryService
       apply_function_lookup(scope, 'float', ast)
     when 'lookup_b'
       apply_function_lookup(scope, 'boolean', ast)
+    when 'st_centroid'
+      apply_function_st_centroid(scope, ast)
+    when 'st_point'
+      apply_function_st_point(scope, ast)
+    when 'st_distance'
+      apply_function_st_distance(scope, ast)
     else
       raise Kaprella::Errors::UndefinedFunctionError.new(ast.name)
     end
@@ -510,6 +516,23 @@ class ResourceQueryService
     end
 
     apply_lookup(scope, cast, relationship, property)
+  end
+
+  def apply_function_st_point(scope, ast)
+    scope, lng = apply_ast(scope, ast.children.first)
+    scope, lat = apply_ast(scope, ast.children.second)
+    return scope, "st_point(#{lng}, #{lat})"
+  end
+
+  def apply_function_st_distance(scope, ast)
+    scope, from = apply_ast(scope, ast.children.first)
+    scope, to = apply_ast(scope, ast.children.second)
+    return scope, "st_distance(#{from}, #{to})"
+  end
+
+  def apply_function_st_centroid(scope, ast)
+    scope, sql = apply_ast(scope, ast.children.first)
+    return scope, "st_centroid(#{sql})"
   end
 
   def apply_ast(scope, ast)
