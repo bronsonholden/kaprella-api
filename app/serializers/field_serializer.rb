@@ -5,7 +5,7 @@ class FieldSerializer < ApplicationSerializer
   attribute :updated_at
 
   attribute :boundary do
-    if object.boundary === String
+    if object.boundary.is_a?(String)
       object.boundary
     else
       object.boundary.as_text
