@@ -28,7 +28,12 @@ class ResourceQueryService
 
   def boolean_function?(ast)
     if ast.is_a?(Keisan::AST::Function)
-      return ast.name == 'and' || ast.name == 'or'
+      %w(
+        and
+        or
+        st_within
+        st_intersects
+      ).include?(ast.name)
     else
       return false
     end
@@ -418,6 +423,12 @@ class ResourceQueryService
       apply_function_st_point(scope, ast)
     when 'st_distance'
       apply_function_st_distance(scope, ast)
+    when 'st_within'
+      apply_function_st_within(scope, ast)
+    when 'st_intersects'
+      apply_function_st_intersects(scope, ast)
+    when 'st_box'
+      apply_function_st_box(scope, ast)
     else
       raise Kaprella::Errors::UndefinedFunctionError.new(ast.name)
     end
@@ -533,6 +544,29 @@ class ResourceQueryService
   def apply_function_st_centroid(scope, ast)
     scope, sql = apply_ast(scope, ast.children.first)
     return scope, "st_centroid(#{sql})"
+  end
+
+  def apply_function_st_intersects(scope, ast)
+    scope, a = apply_ast(scope, ast.children.first)
+    scope, b = apply_ast(scope, ast.children.second)
+    return scope, "st_intersects(#{a}::geometry, #{b}::geometry)"
+  end
+
+  def apply_function_st_within(scope, ast)
+    scope, a = apply_ast(scope, ast.children.first)
+    scope, b = apply_ast(scope, ast.children.second)
+    return scope, "st_within(#{a}::geometry, #{b}::geometry)"
+  end
+
+  # Args should be
+  # N E S W
+  # Y max, X max, Y min, X min
+  def apply_function_st_box(scope, ast)
+    scope, n = apply_ast(scope, ast.children[0])
+    scope, e = apply_ast(scope, ast.children[1])
+    scope, s = apply_ast(scope, ast.children[2])
+    scope, w = apply_ast(scope, ast.children[3])
+    return scope, "st_makeenvelope(#{w}, #{s}, #{e}, #{n}, 4326)"
   end
 
   def apply_ast(scope, ast)
