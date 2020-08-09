@@ -17,7 +17,7 @@ class Api::V1::FarmersController < ApplicationController
 
   # GET /farmers/:id
   def show
-    scope = Farmer.all
+    scope = Farmer.with_field_totals
     realizer = FarmerRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
