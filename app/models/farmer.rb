@@ -10,6 +10,6 @@ class Farmer < ApplicationRecord
         group by farmers.id
       ) as totals on totals.farmer_id = farmers.id
       SQL
-    ).select_append('totals.count as fields_count, totals.area as fields_area')
+    ).select_append('coalesce(totals.count, 0) as fields_count, coalesce(totals.area, 0) as fields_area')
   }
 end
