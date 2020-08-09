@@ -1,7 +1,7 @@
 class Field < ApplicationRecord
   validates :name, presence: true
   validates :boundary, presence: true
-  belongs_to :farmer
+  belongs_to :farmer, -> { Farmer.with_field_totals }
 
   def reload
     Field.find(id)
