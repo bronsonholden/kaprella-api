@@ -24,8 +24,7 @@ class Api::V1::FieldsController < ApplicationController
 
   # POST /fields
   def create
-    scope = Field.all
-    realizer = FieldRealizer.new(intent: :create, parameters: request.params, headers: request.headers, scope: scope)
+    realizer = FieldRealizer.new(intent: :create, parameters: request.params, headers: request.headers)
     realizer.object.save!
     # Field must be retrieved to include generated area column.
     object = Field.with_geo.find(realizer.object.id)
