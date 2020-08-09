@@ -3,7 +3,7 @@ class Farmer < ApplicationRecord
   has_many :fields
 
   scope :with_field_totals, -> {
-    includes(:fields).joins(<<-SQL
+    joins(<<-SQL
       left join (
         select farmers.id as farmer_id, count(fields.id) as count, sum(st_area(fields.boundary)) as area
         from farmers join fields on fields.farmer_id = farmers.id
