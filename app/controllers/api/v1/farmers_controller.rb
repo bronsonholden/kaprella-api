@@ -1,7 +1,7 @@
 class Api::V1::FarmersController < ApplicationController
   # GET /farmers
   def index
-    scope = Farmer.all.includes(:fields)
+    scope = Farmer.with_field_totals
     params = req_params
     realizer_params = params.except('filter', 'sort')
     scope = ResourceQueryService.new(params).apply(scope)

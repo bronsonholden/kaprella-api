@@ -7,8 +7,8 @@ class FarmerSerializer < ApplicationSerializer
 
   def meta
     (super || {}).merge({
-      'fieldCount' => object.fields.length,
-      'fieldsTotalArea' => object.fields.sum('st_area("boundary")')
+      'fieldsCount' => object.fields_count,
+      'fieldsArea' => object.fields_area
     })
   end
 end
