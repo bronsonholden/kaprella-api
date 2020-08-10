@@ -1,7 +1,16 @@
 class Field < ApplicationRecord
+  PRETTY_NAMES = {
+    'farmer_id' => 'Farmer ID',
+    'srid' => 'SRID'
+  }.freeze
+
   validates :name, presence: true
   validates :boundary, presence: true
   belongs_to :farmer, -> { Farmer.with_field_totals }
+
+  def self.pretty_name(attribute)
+    PRETTY_NAMES[attribute] || super
+  end
 
   def reload
     Field.find(id)

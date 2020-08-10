@@ -31,7 +31,8 @@ class ReflectionMetaService
       'sqlTypeMetadata' => sql_type_metadata_json(column.sql_type_metadata),
       'defaultValue' => column.default,
       'allowNull' => column.null,
-      'comment' => column.comment
+      'comment' => column.comment,
+      'prettyName' => model.pretty_name(column.name)
     }
   end
 
@@ -40,7 +41,8 @@ class ReflectionMetaService
       'relationshipType' => relationship_type_name(relationship),
       'resource' => relationship.class_name,
       'foreignKey' => relationship.foreign_key,
-      'options' => relationship.options
+      'options' => relationship.options,
+      'prettyName' => model.pretty_name(relationship.name.to_s)
     }
   end
 
