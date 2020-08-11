@@ -32,6 +32,7 @@ class ReflectionMetaService
       'defaultValue' => column.default,
       'allowNull' => column.null,
       'comment' => column.comment,
+      'name' => column.name,
       'prettyName' => model.pretty_name(column.name)
     }
   end
@@ -42,6 +43,7 @@ class ReflectionMetaService
       'resource' => relationship.class_name,
       'foreignKey' => relationship.foreign_key,
       'options' => relationship.options,
+      'name' => relationship.name.to_s,
       'prettyName' => model.pretty_name(relationship.name.to_s)
     }
   end
