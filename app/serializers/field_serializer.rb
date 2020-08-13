@@ -12,13 +12,5 @@ class FieldSerializer < ApplicationSerializer
     end
   end
 
-  attribute :area do
-    object.boundary_area
-  end
-
-  attribute :centroid do
-    object.centroid
-  end
-
   has_one :farmer
 end
