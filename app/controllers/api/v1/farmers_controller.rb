@@ -1,7 +1,7 @@
 class Api::V1::FarmersController < ApplicationController
   # GET /farmers
   def index
-    scope = Farmer.with_field_totals
+    scope = Farmer.with_generated_columns
     params = req_params
     realizer_params = params.except('filter', 'sort')
     scope = ResourceQueryService.new(params).apply(scope)
@@ -17,7 +17,7 @@ class Api::V1::FarmersController < ApplicationController
 
   # GET /farmers/:id
   def show
-    scope = Farmer.with_field_totals
+    scope = Farmer.with_generated_columns
     realizer = FarmerRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -26,13 +26,13 @@ class Api::V1::FarmersController < ApplicationController
   def create
     realizer = FarmerRealizer.new(intent: :create, parameters: request.params, headers: request.headers)
     realizer.object.save!
-    object = Farmer.with_field_totals.find(realizer.object.id)
+    object = Farmer.with_generated_columns.find(realizer.object.id)
     render json: JSONAPI::Serializer.serialize(object), status: :created
   end
 
   # PATCH/PUT /farmers/:id
   def update
-    scope = Farmer.with_field_totals
+    scope = Farmer.with_generated_columns
     realizer = FarmerRealizer.new(intent: :update, parameters: request.params, headers: request.headers, scope: scope)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
