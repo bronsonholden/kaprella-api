@@ -15,7 +15,7 @@ class ReflectionMetaService
 
   def generate
     {
-      'columns' => columns.map { |name, column|
+      'attributes' => columns.map { |name, column|
         [ name.camelize(:lower), serialize_column(column) ]
       }.to_h,
       'relationships' => relationships.map { |name, relationship|
