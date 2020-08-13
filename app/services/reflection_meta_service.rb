@@ -20,6 +20,11 @@ class ReflectionMetaService
       }.to_h,
       'relationships' => relationships.map { |name, relationship|
         [ name.camelize(:lower), serialize_relationship(relationship) ]
+      }.to_h,
+      'generated' => model.generated_columns.reject { |column|
+        column[:sql_type].nil?
+      }.map { |column|
+        [ column[:name].to_s.camelize(:lower), serialize_generated_column(column) ]
       }.to_h
     }
   end
@@ -45,6 +50,15 @@ class ReflectionMetaService
       'options' => relationship.options,
       'name' => relationship.name.to_s,
       'prettyName' => model.pretty_name(relationship.name.to_s)
+    }
+  end
+
+  def serialize_generated_column(column)
+    {
+      'sqlTypeMetadata' => {
+        'type' => column[:sql_type]
+      },
+      'prettyName' => model.pretty_name(column[:name].to_s)
     }
   end
 
