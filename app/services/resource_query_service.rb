@@ -33,6 +33,8 @@ class ResourceQueryService
         or
         st_within
         st_intersects
+        is_even
+        is_odd
       ).include?(ast.name)
     else
       return false
@@ -224,6 +226,18 @@ class ResourceQueryService
     return scope, "ceil(#{num}::numeric)"
   end
 
+  def apply_function_is_even(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "((#{num}::integer) % 2) = 0"
+  end
+
+  def apply_function_is_odd(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "((#{num}::integer) % 2) = 1"
+  end
+
   # Query expression function: ceil
   # Return the nearest integer. If the decimal part is greater than or equal
   # to 0.5, the number is rounded up, otherwise it is rounded down.
@@ -383,6 +397,10 @@ class ResourceQueryService
       apply_function_floor(scope, ast)
     when 'ceil'
       apply_function_ceil(scope, ast)
+    when 'is_even'
+      apply_function_is_even(scope, ast)
+    when 'is_odd'
+      apply_function_is_odd(scope, ast)
     when 'current_date'
       apply_function_current_date(scope, ast)
     when 'current_timestamp'

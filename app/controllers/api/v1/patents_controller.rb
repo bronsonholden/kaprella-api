@@ -8,9 +8,11 @@ class Api::V1::PatentsController < ApplicationController
     realizer = PatentRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
     reflection = ReflectionMetaService.new(Patent)
+    filters = FilterHumanizeMetaService.new(Patent, params['filter'])
     meta = {
       'page' => page.generate,
-      'reflection' => reflection.generate
+      'reflection' => reflection.generate,
+      'filterLabels' => filters.generate
     }
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: meta), status: :ok
   end

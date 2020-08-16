@@ -8,9 +8,11 @@ class Api::V1::FieldsController < ApplicationController
     realizer = FieldRealizer.new(intent: :index, parameters: realizer_params, headers: request.headers, scope: scope)
     page = PaginationMetaService.new(page_offset, page_limit, realizer.total_count)
     reflection = ReflectionMetaService.new(Field)
+    filters = FilterHumanizeMetaService.new(Field, params['filter'])
     meta = {
       'page' => page.generate,
-      'reflection' => reflection.generate
+      'reflection' => reflection.generate,
+      'filterLabels' => filters.generate
     }
     render json: JSONAPI::Serializer.serialize(realizer.object, include: ['farmer'], is_collection: true, meta: meta), status: :ok
   end
