@@ -64,6 +64,8 @@ class FilterHumanizeMetaService
     lval = humanize_ast(ast.children.first)
     rval = humanize_ast(ast.children.second)
 
+    return if lval.nil? || rval.nil?
+
     "#{lval} #{operator} #{rval}"
   end
 
