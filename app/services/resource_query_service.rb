@@ -35,6 +35,7 @@ class ResourceQueryService
         st_intersects
         is_even
         is_odd
+        like
         unlike
       ).include?(ast.name)
     else
