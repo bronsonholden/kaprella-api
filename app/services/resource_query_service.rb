@@ -35,6 +35,7 @@ class ResourceQueryService
         st_intersects
         is_even
         is_odd
+        unlike
       ).include?(ast.name)
     else
       return false
@@ -118,6 +119,24 @@ class ResourceQueryService
   def apply_function_upper(scope, ast)
     scope, str = apply_ast(scope, ast.children.first)
     return scope, "upper(#{str})"
+  end
+
+  # Query expression function: like
+  # Substring comparison
+  # like(string1, 'my string%')
+  def apply_function_like(scope, ast)
+    scope, lval = apply_ast(scope, ast.children.first)
+    scope, rval = apply_ast(scope, ast.children.second)
+    return scope, "#{lval} like #{rval}"
+  end
+
+  # Query expression function: like
+  # Substring comparison
+  # unlike(string1, 'my string%')
+  def apply_function_unlike(scope, ast)
+    scope, lval = apply_ast(scope, ast.children.first)
+    scope, rval = apply_ast(scope, ast.children.second)
+    return scope, "#{lval} not like #{rval}"
   end
 
   # Query expression function: prop
@@ -371,6 +390,10 @@ class ResourceQueryService
       apply_function_lower(scope, ast)
     when 'upper'
       apply_function_upper(scope, ast)
+    when 'like'
+      apply_function_like(scope, ast)
+    when 'unlike'
+      apply_function_unlike(scope, ast)
     when 'prop'
       apply_function_prop(scope, ast)
     when 'to_i'
