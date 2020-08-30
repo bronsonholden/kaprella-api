@@ -40,6 +40,12 @@ class FilterHumanizeMetaService
     when 'is_odd'
       name = humanize_ast(ast.children.first)
       "#{name} is odd"
+    when 'lookup_s', 'lookup_i', 'lookup_b', 'lookup_f'
+      reflection = model.reflections.fetch(humanize_ast(ast.children.first))
+      prop = humanize_ast(ast.children.second)
+      if !reflection.nil?
+        "#{reflection.klass.model_name.human} #{prop}"
+      end
     end
   end
 
