@@ -19,9 +19,9 @@ class Api::V1::FieldsController < ApplicationController
 
   # GET /fields/:id
   def show
-    scope = Field.with_generated_columns
+    scope = Field.with_generated_columns.includes(:farmer)
     realizer = FieldRealizer.new(intent: :show, parameters: request.params, headers: request.headers, scope: scope)
-    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, include: ['farmer']), status: :ok
   end
 
   # POST /fields
