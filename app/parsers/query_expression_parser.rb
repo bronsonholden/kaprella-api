@@ -1,9 +1,17 @@
 class QueryExpressionParser < BabelBridge::Parser
   ignore_whitespace
 
-  rule :related_attribute, :attribute, '.', :attribute do
+  binary_operators_rule :binary_expression, :operand, [[:/, :*], [:+, :-], [:<, :<=, :>, :>=, :==, :!=]] do
     def evaluate(scope)
-      return scope, self.text
+      scope, lval = left.evaluate(scope)
+      scope, rval = right.evaluate(scope)
+      return scope, "#{lval} #{operator == :== ? '=' : operator} #{rval}"
+    end
+  end
+
+  rule :expression, any(:related_attribute, :attribute, :string, :number, :boolean, :binary_expression) do
+    def evaluate(scope)
+      return self.pop_match.evaluate(scope)
     end
   end
 
@@ -15,6 +23,12 @@ class QueryExpressionParser < BabelBridge::Parser
       else
         return scope, self.text
       end
+    end
+  end
+
+  rule :related_attribute, :attribute, '.', :attribute do
+    def evaluate(scope)
+      return scope, self.text
     end
   end
 
@@ -46,20 +60,6 @@ class QueryExpressionParser < BabelBridge::Parser
   rule :boolean, /(true|false)/ do
     def evaluate(scope)
       return scope, self.text
-    end
-  end
-
-  binary_operators_rule :binary_expression, :operand, [[:/, :*], [:+, :-], [:<, :<=, :>, :>=, :==, :!=]] do
-    def evaluate(scope)
-      scope, lval = left.evaluate(scope)
-      scope, rval = right.evaluate(scope)
-      return scope, "#{lval} #{operator == :== ? '=' : operator} #{rval}"
-    end
-  end
-
-  rule :expression, any(:related_attribute, :attribute, :string, :number, :boolean, :binary_expression) do
-    def evaluate(scope)
-      return self.pop_match.evaluate(scope)
     end
   end
 end
