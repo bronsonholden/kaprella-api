@@ -459,6 +459,8 @@ class ResourceQueryService
       apply_function_lookup(scope, 'float', ast)
     when 'lookup_b'
       apply_function_lookup(scope, 'boolean', ast)
+    when 'st_area'
+      apply_function_st_area(scope, ast)
     when 'st_centroid'
       apply_function_st_centroid(scope, ast)
     when 'st_point'
@@ -581,6 +583,11 @@ class ResourceQueryService
     scope, from = apply_ast(scope, ast.children.first)
     scope, to = apply_ast(scope, ast.children.second)
     return scope, "st_distance(#{from}, #{to})"
+  end
+
+  def apply_function_st_area(scope, ast)
+    scope, sql = apply_ast(scope, ast.children.first)
+    return scope, "st_area(#{sql})"
   end
 
   def apply_function_st_centroid(scope, ast)
