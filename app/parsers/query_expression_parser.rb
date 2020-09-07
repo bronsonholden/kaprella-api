@@ -9,7 +9,7 @@ class QueryExpressionParser < BabelBridge::Parser
     end
   end
 
-  rule :expression, any(:related_attribute, :attribute, :string, :number, :boolean, :binary_expression) do
+  rule :expression, any(:related_count, :related_attribute, :attribute, :string, :number, :boolean, :binary_expression) do
     def evaluate(scope)
       return self.pop_match.evaluate(scope)
     end
@@ -26,9 +26,49 @@ class QueryExpressionParser < BabelBridge::Parser
     end
   end
 
+  rule :related_count, :attribute, '.', /count\b/ do
+    def evaluate(scope)
+      relationship = attribute.text
+      reflection = scope.model.reflections[relationship]
+      raise "No such relationship: #{relationship}" if reflection.nil?
+      case reflection
+      when ActiveRecord::Reflection::HasManyReflection
+        column_name = "#{relationship}__count"
+        foreign_key = reflection.foreign_key
+        primary_key = "#{scope.table_name}.#{scope.primary_key}"
+        scope = scope.joins(<<-SQL)
+          LEFT JOIN (
+            SELECT #{foreign_key}, COUNT(*) AS count
+            FROM #{reflection.klass.table_name}
+            GROUP BY #{foreign_key}
+          ) AS #{column_name}___inner
+            ON #{column_name}___inner.#{foreign_key} = #{primary_key}
+        SQL
+        sql = "#{column_name}___inner.count"
+      else
+        raise "Unprocessable aggregate: #{relationship}.count"
+      end
+
+      return scope, sql
+    end
+  end
+
   rule :related_attribute, :attribute, '.', :attribute do
     def evaluate(scope)
-      return scope, self.text
+      relationship = attribute[0].text
+      column = attribute[1].text
+      reflection = scope.model.reflections[relationship]
+      raise "No such relationship: #{relationship}" if reflection.nil?
+      case reflection
+      when ActiveRecord::Reflection::BelongsToReflection,
+           ActiveRecord::Reflection::HasOneReflection
+        sql = "#{reflection.klass.table_name}.#{column}"
+        scope = scope.joins(relationship.to_sym).select_append(sql)
+      else
+        raise "Unprocessable relationship: #{relationship}"
+      end
+
+      return scope, sql
     end
   end
 

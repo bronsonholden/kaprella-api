@@ -13,6 +13,10 @@ RSpec.describe QueryExpressionParser do
   let(:evaluated_scope) { evaluated[0] }
   let(:evaluated_sql) { evaluated[1] }
   let(:filtered_scope) { evaluated_scope.where(evaluated_sql) }
+  let(:generated_name) { 'generated' }
+  let(:generated_scope) {
+    evaluated_scope.select_append("#{evaluated_sql} as \"#{generated_name}\"")
+  }
 
   let(:scope) { Farmer.all }
 
@@ -24,6 +28,60 @@ RSpec.describe QueryExpressionParser do
   end
 
   describe 'relationships' do
+    describe 'has many' do
+      let(:scope) { Farmer.all }
+      let(:farmer) { create :farmer }
+      let(:count) { 10 }
+
+      # Create some fields for testing
+      before(:each) do
+        count.times do
+          create :field, farmer: farmer
+        end
+      end
+
+      describe 'generated column' do
+        let(:expression) { 'fields.count' }
+        let(:value) {
+          generated_scope.find(farmer.id).send(generated_name.to_sym)
+        }
+        it 'returns count' do
+          expect(value).to eq(10)
+        end
+      end
+
+      describe 'filtering' do
+        # So we don't raise RecordNotFound in the 'not matching' test
+        let(:record) { filtered_scope.where(id: farmer.id) }
+
+        context 'matching' do
+          let(:expression) { "fields.count == #{count}" }
+          it 'returns record' do
+            expect(record).to include(farmer)
+          end
+        end
+
+        context 'not matching' do
+          let(:expression) { "fields.count != #{count}" }
+          it 'returns no record' do
+            expect(record).not_to include(farmer)
+          end
+        end
+      end
+    end
+
+    describe 'belongs to' do
+      let(:scope) { Field.all }
+      let(:expression) { 'farmer.name' }
+      let(:farmer) { create :farmer }
+      let(:field) { create :field, farmer: farmer }
+      let(:value) {
+        generated_scope.find(field.id).send(generated_name.to_sym)
+      }
+      it 'returns attribute' do
+        expect(value).to eq(farmer.name)
+      end
+    end
   end
 
   describe 'literals' do
