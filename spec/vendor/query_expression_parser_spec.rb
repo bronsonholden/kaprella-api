@@ -28,6 +28,13 @@ RSpec.describe QueryExpressionParser do
   end
 
   describe 'relationships' do
+    context 'invalid relationship' do
+      let(:expression) { 'doodad.name' }
+      it 'raises error' do
+        expect { evaluated_sql }.to raise_error(Kaprella::Errors::InvalidRelationshipError)
+      end
+    end
+
     describe 'has many' do
       let(:scope) { Farmer.all }
       let(:farmer) { create :farmer }
@@ -37,6 +44,13 @@ RSpec.describe QueryExpressionParser do
       before(:each) do
         count.times do
           create :field, farmer: farmer
+        end
+      end
+
+      context 'invalid usage' do
+        let(:expression) { 'fields.name' }
+        it 'raises error' do
+          expect { evaluated_sql }.to raise_error(Kaprella::Errors::RelationshipTypeError)
         end
       end
 
@@ -80,6 +94,13 @@ RSpec.describe QueryExpressionParser do
       }
       it 'returns attribute' do
         expect(value).to eq(farmer.name)
+      end
+
+      context 'invalid usage' do
+        let(:expression) { 'farmer.count' }
+        it 'raises error' do
+          expect { evaluated_sql }.to raise_error(Kaprella::Errors::RelationshipTypeError)
+        end
       end
     end
   end

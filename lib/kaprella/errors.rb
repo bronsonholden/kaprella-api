@@ -9,6 +9,18 @@ module Kaprella
       end
     end
 
+    class InvalidRelationshipError < Kaprella::Errors::Base
+      def initialize(relationship)
+        super("No such relationship: #{relationship}")
+      end
+    end
+
+    class RelationshipTypeError < Kaprella::Errors::Base
+      def initialize(relationship, actual_type)
+        super("#{relationship} is a #{actual_type} relationship")
+      end
+    end
+
     class RestrictedGeneratedColumnIdentifier < Kaprella::Errors::Base
       def initialize(identifier)
         super("Restricted generated column identifier (matches native attribute or a reserved keyword): #{identifier}")

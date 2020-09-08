@@ -30,7 +30,7 @@ class QueryExpressionParser < BabelBridge::Parser
     def evaluate(scope)
       relationship = attribute.text
       reflection = scope.model.reflections[relationship]
-      raise "No such relationship: #{relationship}" if reflection.nil?
+      raise Kaprella::Errors::InvalidRelationshipError.new(relationship) if reflection.nil?
       case reflection
       when ActiveRecord::Reflection::HasManyReflection
         column_name = "#{relationship}__count"
@@ -46,7 +46,8 @@ class QueryExpressionParser < BabelBridge::Parser
         SQL
         sql = "#{column_name}___inner.count"
       else
-        raise "Unprocessable aggregate: #{relationship}.count"
+        actual_type = reflection.class.to_s.demodulize.underscore
+        raise Kaprella::Errors::RelationshipTypeError.new(relationship, actual_type.gsub(/_reflection/, ''))
       end
 
       return scope, sql
@@ -58,14 +59,15 @@ class QueryExpressionParser < BabelBridge::Parser
       relationship = attribute[0].text
       column = attribute[1].text
       reflection = scope.model.reflections[relationship]
-      raise "No such relationship: #{relationship}" if reflection.nil?
+      raise Kaprella::Errors::InvalidRelationshipError.new(relationship) if reflection.nil?
       case reflection
       when ActiveRecord::Reflection::BelongsToReflection,
            ActiveRecord::Reflection::HasOneReflection
         sql = "#{reflection.klass.table_name}.#{column}"
         scope = scope.joins(relationship.to_sym).select_append(sql)
       else
-        raise "Unprocessable relationship: #{relationship}"
+        actual_type = reflection.class.to_s.demodulize.underscore
+        raise Kaprella::Errors::RelationshipTypeError.new(relationship, actual_type.gsub(/_reflection/, ''))
       end
 
       return scope, sql
