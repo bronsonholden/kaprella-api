@@ -1,107 +1,58 @@
-class QueryExpressionParser < BabelBridge::Parser
-  ignore_whitespace
+class QueryExpressionParser < Parslet::Parser
+  root(:expression)
 
-  binary_operators_rule :binary_expression, :operand, [[:/, :*], [:+, :-], [:<, :<=, :>, :>=, :==, :!=]] do
-    def evaluate(scope)
-      scope, lval = left.evaluate(scope)
-      scope, rval = right.evaluate(scope)
-      return scope, "#{lval} #{operator == :== ? '=' : operator} #{rval}"
-    end
-  end
+  rule(:expression) {
+    space? >> lparen >> space? >> operation.as(:body) >> rparen >> space?
+  }
 
-  rule :expression, any(:related_count, :related_attribute, :attribute, :string, :number, :boolean, :binary_expression) do
-    def evaluate(scope)
-      return self.pop_match.evaluate(scope)
-    end
-  end
+  rule(:atom) { expression | literal | related_attribute | attribute }
 
-  rule :attribute, /[a-zA-Z_]+/ do
-    def evaluate(scope)
-      if scope.attribute_names.include?(self.text)
-        column_name = "#{scope.table_name}.#{self.text}"
-        return scope.select_append(column_name), column_name
-      else
-        return scope, self.text
-      end
-    end
-  end
+  rule(:space)  { match('\s').repeat(1) }
+  rule(:space?) { space.maybe }
+  rule(:lparen) { str('(') >> space? }
+  rule(:rparen) { str(')') >> space? }
 
-  rule :related_count, :attribute, '.', /count\b/ do
-    def evaluate(scope)
-      relationship = attribute.text
-      reflection = scope.model.reflections[relationship]
-      raise Kaprella::Errors::InvalidRelationshipError.new(relationship) if reflection.nil?
-      case reflection
-      when ActiveRecord::Reflection::HasManyReflection
-        column_name = "#{relationship}__count"
-        foreign_key = reflection.foreign_key
-        primary_key = "#{scope.table_name}.#{scope.primary_key}"
-        scope = scope.joins(<<-SQL)
-          LEFT JOIN (
-            SELECT #{foreign_key}, COUNT(*) AS count
-            FROM #{reflection.klass.table_name}
-            GROUP BY #{foreign_key}
-          ) AS #{column_name}___inner
-            ON #{column_name}___inner.#{foreign_key} = #{primary_key}
-        SQL
-        sql = "#{column_name}___inner.count"
-      else
-        actual_type = reflection.class.to_s.demodulize.underscore
-        raise Kaprella::Errors::RelationshipTypeError.new(relationship, actual_type.gsub(/_reflection/, ''))
-      end
+  rule(:digit) { match('[0-9]') }
+  rule(:number) {
+    (
+      str('-').maybe >> (
+        str('0') | (match('[1-9]') >> digit.repeat)
+      ) >> (
+        str('.') >> digit.repeat(1)
+      ).maybe >> (
+        match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
+      ).maybe
+    ).as(:number) >> space?
+  }
 
-      return scope, sql
-    end
-  end
+  rule(:string) {
+    str('"') >> (
+      str('\\') >> any | str('"').absent? >> any
+    ).repeat.as(:string) >> str('"') >> space?
+  }
 
-  rule :related_attribute, :attribute, '.', :attribute do
-    def evaluate(scope)
-      relationship = attribute[0].text
-      column = attribute[1].text
-      reflection = scope.model.reflections[relationship]
-      raise Kaprella::Errors::InvalidRelationshipError.new(relationship) if reflection.nil?
-      case reflection
-      when ActiveRecord::Reflection::BelongsToReflection,
-           ActiveRecord::Reflection::HasOneReflection
-        sql = "#{reflection.klass.table_name}.#{column}"
-        scope = scope.joins(relationship.to_sym).select_append(sql)
-      else
-        actual_type = reflection.class.to_s.demodulize.underscore
-        raise Kaprella::Errors::RelationshipTypeError.new(relationship, actual_type.gsub(/_reflection/, ''))
-      end
+  rule(:mul_op) { match['*/'].as(:infix_op) >> space? }
+  rule(:add_op) { match['+-'].as(:infix_op) >> space? }
+  rule(:lt) { str('<') }
+  rule(:le) { str('<=') }
+  rule(:gt) { str('>') }
+  rule(:ge) { str('>=') }
+  rule(:eq) { str('==') }
+  rule(:ne) { str('!=') }
+  rule(:logic_op) { (le | ge | lt | gt | eq | ne).as(:infix_op) >> space? }
+  rule(:infix_op) { (mul_op | add_op | logic_op).as(:infix_op) }
 
-      return scope, sql
-    end
-  end
+  rule(:operation) {
+    infix_expression(
+      atom,
+      [mul_op, 3, :left],
+      [add_op, 2, :right],
+      [logic_op, 1, :left]
+    ) >> space?
+  }
 
-  rule :operand, :expression do
-    def evaluate(scope)
-      expression.evaluate(scope)
-    end
-  end
+  rule(:related_attribute) { match('[a-zA-Z]').repeat.as(:relationship) >> str('.') >> match('[a-zA-Z]').repeat.as(:attribute) >> space? }
+  rule(:attribute) { match('[a-zA-Z]').repeat.as(:attribute) >> space? }
 
-  rule :operand, '(', :expression, ')' do
-    def evaluate(scope)
-      scope, sql = expression.evaluate(scope)
-      return scope, "(#{sql})"
-    end
-  end
-
-  rule :string, /"(?:[^"\\]|\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}))*"/ do
-    def evaluate(scope)
-      return scope, self.text
-    end
-  end
-
-  rule :number, /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/ do
-    def evaluate(scope)
-      return scope, self.text
-    end
-  end
-
-  rule :boolean, /(true|false)/ do
-    def evaluate(scope)
-      return scope, self.text
-    end
-  end
+  rule(:literal) { number | string}
 end

@@ -9,6 +9,12 @@ module Kaprella
       end
     end
 
+    class InvalidFunctionError < Kaprella::Errors::Base
+      def initialize(function)
+        super("No such function: #{function}")
+      end
+    end
+
     class InvalidRelationshipError < Kaprella::Errors::Base
       def initialize(relationship)
         super("No such relationship: #{relationship}")
