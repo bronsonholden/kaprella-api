@@ -77,6 +77,7 @@ GEM
     auto_increment (1.5.1)
       activerecord (>= 4.0, < 6.1)
       activesupport (>= 4.0, < 6.1)
+    babel_bridge (0.5.5)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
     builder (3.2.4)
@@ -240,6 +241,7 @@ DEPENDENCIES
   activerecord-postgis-adapter
   api-versions (~> 1.0)
   auto_increment (~> 1.5)
+  babel_bridge
   bootsnap (>= 1.4.2)
   byebug
   countries
