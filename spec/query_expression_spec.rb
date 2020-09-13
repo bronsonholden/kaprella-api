@@ -179,6 +179,22 @@ RSpec.describe 'Query expression' do
       end
     end
 
+    describe 'related count' do
+      let(:expression) { 'fields.count' }
+      let(:generated_record) { generated_scope.first }
+      let(:farmer) { create :farmer }
+      let(:count) { 10 }
+      before(:each) do
+        count.times do
+          create :field, farmer: farmer
+        end
+      end
+
+      it 'returns count' do
+        expect(generated_value).to eq(count)
+      end
+    end
+
     describe 'literals' do
       before(:each) do create :farmer; end
       let(:generated_record) { generated_scope.first }

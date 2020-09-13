@@ -17,6 +17,29 @@ class QueryExpressionTransform < Parslet::Transform
     column_name = attribute.to_s.underscore
     "#{context[:scope].table_name}.#{column_name}"
   }
+  rule(relationship: simple(:relationship), count: simple(:count)) {
+    relationship_name = relationship.to_s
+    reflection = context[:scope].model.reflections[relationship_name]
+    raise Kaprella::Errors::InvalidRelationshipError.new(relationship_name) if reflection.nil?
+    case reflection
+    when ActiveRecord::Reflection::HasManyReflection
+      column_name = "#{relationship_name}__count"
+      foreign_key = reflection.foreign_key
+      primary_key = "#{context[:scope].table_name}.#{context[:scope].primary_key}"
+      context[:scope] = context[:scope].joins(<<-SQL)
+        LEFT JOIN (
+          SELECT #{foreign_key}, COUNT(*) AS count
+          FROM #{reflection.klass.table_name}
+          GROUP BY #{foreign_key}
+        ) AS #{column_name}___inner
+          ON #{column_name}___inner.#{foreign_key} = #{primary_key}
+      SQL
+      sql = "#{column_name}___inner.count"
+    else
+      actual_type = reflection.class.to_s.demodulize.underscore
+      raise Kaprella::Errors::RelationshipTypeError.new(relationship, actual_type.gsub(/_reflection/, ''))
+    end
+  }
   rule(relationship: simple(:relationship), attribute: simple(:attribute)) {
     column_name = attribute.to_s.underscore
     relationship_name = relationship.to_s.underscore

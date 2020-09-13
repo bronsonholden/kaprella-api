@@ -5,7 +5,7 @@ class QueryExpressionParser < Parslet::Parser
     space? >> lparen >> space? >> operation.as(:body) >> rparen >> space?
   }
 
-  rule(:atom) { expression | literal | related_attribute | attribute }
+  rule(:atom) { expression | literal | related_count | related_attribute | attribute }
 
   rule(:space)  { match('\s').repeat(1) }
   rule(:space?) { space.maybe }
@@ -49,6 +49,10 @@ class QueryExpressionParser < Parslet::Parser
       [add_op, 2, :right],
       [logic_op, 1, :left]
     ) >> space?
+  }
+
+  rule(:related_count) {
+    match('[a-zA-Z]').repeat.as(:relationship) >> str('.') >> str('count').as(:count) >> space?
   }
 
   rule(:related_attribute) { match('[a-zA-Z]').repeat.as(:relationship) >> str('.') >> match('[a-zA-Z]').repeat.as(:attribute) >> space? }
