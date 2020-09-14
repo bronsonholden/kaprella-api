@@ -18,146 +18,266 @@ RSpec.describe BabelQueryExpressionParser do
     evaluated_scope.select_append("#{evaluated_sql} as \"#{generated_name}\"")
   }
 
-  let(:scope) { Farmer.all }
+  describe 'evaluated' do
+    let(:scope) { Farmer.all }
+    let(:generated_value) {
+      generated_scope.first.send(generated_name.to_sym)
+    }
 
-  describe 'literals' do
-    describe 'numbers' do
-      let(:expression) { '1' }
-      it 'returns value' do
-        expect(evaluated).not_to be_nil
+    describe 'literals' do
+      before(:each) do
+        create :farmer
       end
-    end
 
-    describe 'strings' do
-      let(:expression) { '"str"' }
-      it 'returns value' do
-        expect(evaluated).not_to be_nil
+      describe 'numbers' do
+        {
+          '1' => 1,
+          '1e2' => 100,
+          '-5.3' => -5.3
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
       end
-    end
-  end
 
-  describe 'arithmetic' do
-    before(:each) do
-      create :farmer
-    end
-
-    describe '+' do
-      [
-        '1 + 2 + 3',
-        '(1 + 2) + 3',
-        '1 + (2 + 3)'
-      ].each do |expr|
-        context expr do
-          let(:expression) { expr }
-          it 'returns value' do
-            expect(generated_scope.first.send(generated_name.to_sym)).to eq(6)
+      describe 'strings' do
+        [
+          'abcd',
+          'abc"',
+          'abcdef\\',
+          'Æ'
+        ].each do |str|
+          context str do
+            let(:expression) { str.inspect }
+            it 'returns value' do
+              expect(generated_value).to eq(str)
+            end
           end
         end
       end
     end
 
-    describe '-' do
-      {
-        '1 - 2 - 3' => -4,
-        '(1 - 2) - 3' => -4,
-        '1 - (2 - 3)' => 2
-      }.each do |expr, value|
-        context expr do
-          let(:expression) { expr }
-          it 'returns value' do
-            expect(generated_scope.first.send(generated_name.to_sym)).to eq(value)
+    describe 'arithmetic' do
+      before(:each) do
+        create :farmer
+      end
+
+      describe '+' do
+        {
+          '1 + 2 + 3' => 6,
+          '(1 + 2) + 3' => 6,
+          '1 + (2 + 3)' => 6
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '-' do
+        {
+          '1 - 2 - 3' => -4,
+          '(1 - 2) - 3' => -4,
+          '1 - (2 - 3)' => 2
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '*' do
+        {
+          '1 * 2 * 3' => 6,
+          '(1 * 2) * 3' => 6,
+          '1 * (2 * 3)' => 6
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '/' do
+        {
+          '10 / 5 / 2' => 1,
+          '(10 / 5) / 2' => 1,
+          '10 / (20 / 2)' => 1
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
           end
         end
       end
     end
-  end
 
-  describe 'boolean expressions' do
-    before(:each) do
-      Farmer.create(name: 'Test Farmer')
-    end
+    describe 'boolean expressions' do
+      before(:each) do
+        create :farmer
+      end
 
-    shared_examples 'contains_results' do
-      it 'returns result' do
-        expect(filtered_scope.size).to eq(1)
+      describe '<' do
+        {
+          '1 < 2' => true,
+          '2 < 1' => false,
+          '1 < (1 + 1)' => true
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '<=' do
+        {
+          '1 <= 2' => true,
+          '1 <= 1' => true,
+          '2 <= 1' => false,
+          '1 <= (1 + 1)' => true,
+          '1 <= (0 + 1)' => true
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '>' do
+        {
+          '1 > 2' => false,
+          '2 > 1' => true,
+          '1 > (1 + 1)' => false,
+          '2 > (0 + 1)' => true
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '>=' do
+        {
+          '1 >= 2' => false,
+          '1 >= 1' => true,
+          '2 >= 1' => true,
+          '1 >= (1 + 1)' => false,
+          '2 >= (1 + 1)' => true
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '==' do
+        {
+          '1 == 2' => false,
+          '1 == 1' => true,
+          '1 == (1 + 1)' => false,
+          '2 == (1 + 1)' => true
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+
+      describe '!=' do
+        {
+          '1 != 2' => true,
+          '1 != 1' => false,
+          '1 != (1 + 1)' => true,
+          '2 != (1 + 1)' => false
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
       end
     end
 
-    shared_examples 'contains_no_results' do
-      it 'returns no result' do
-        expect(filtered_scope.size).to eq(0)
+    describe 'attribute' do
+      let(:scope) { Farmer.all }
+      let(:farmer_name) { 'ACME Farmer' }
+      let(:generated_value) {
+        generated_scope.first.send(generated_name.to_sym)
+      }
+      let(:expression) { 'name' }
+      before(:each) do
+        create :farmer, name: farmer_name
+      end
+
+      it 'returns attribute' do
+        expect(generated_value).to eq(farmer_name)
       end
     end
 
-    describe '<' do
-      context 'truthy' do
-        let(:expression) { '1 < 2' }
-        include_examples 'contains_results'
+    describe 'related attribute' do
+      let(:scope) { Field.all }
+      let(:generated_value) {
+        generated_scope.first.send(generated_name.to_sym)
+      }
+      let(:farmer_name) { 'ACME Farmer' }
+      let(:expression) { 'farmer.name' }
+      let(:farmer) { create :farmer, name: farmer_name }
+      before(:each) do
+        create :field, farmer: farmer
       end
-
-      context 'falsey' do
-        let(:expression) { '2 < 1' }
-        include_examples 'contains_no_results'
-      end
-    end
-
-    describe '>' do
-      context 'truthy' do
-        let(:expression) { '2 > 1' }
-        include_examples 'contains_results'
-      end
-
-      context 'falsey' do
-        let(:expression) { '1 > 2' }
-        include_examples 'contains_no_results'
+      it 'returns attribute' do
+        expect(generated_value).to eq(farmer_name)
       end
     end
 
-    describe '<=' do
-      context 'truthy' do
-        let(:expression) { '2 <= 2' }
-        include_examples 'contains_results'
+    describe 'related count' do
+      let(:scope) { Farmer.all }
+      let(:generated_value) {
+        generated_scope.first.send(generated_name.to_sym)
+      }
+      let(:farmer_name) { 'ACME Farmer' }
+      let(:expression) { 'fields.count' }
+      let(:farmer) { create :farmer, name: farmer_name }
+      let(:count) { 10 }
+      before(:each) do
+        count.times do
+          create :field, farmer: farmer
+        end
       end
-
-      context 'falsey' do
-        let(:expression) { '2 <= 1' }
-        include_examples 'contains_no_results'
-      end
-    end
-
-    describe '>=' do
-      context 'truthy' do
-        let(:expression) { '2 >= 2' }
-        include_examples 'contains_results'
-      end
-
-      context 'falsey' do
-        let(:expression) { '1 >= 2' }
-        include_examples 'contains_no_results'
-      end
-    end
-
-    describe '==' do
-      context 'truthy' do
-        let(:expression) { '1 == 1' }
-        include_examples 'contains_results'
-      end
-
-      context 'falsey' do
-        let(:expression) { '1 == 2' }
-        include_examples 'contains_no_results'
-      end
-    end
-
-    describe '!=' do
-      context 'truthy' do
-        let(:expression) { '1 != 2' }
-        include_examples 'contains_results'
-      end
-
-      context 'falsey' do
-        let(:expression) { '1 != 1' }
-        include_examples 'contains_no_results'
+      it 'returns attribute' do
+        expect(generated_value).to eq(count)
       end
     end
   end
