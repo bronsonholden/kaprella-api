@@ -29,6 +29,7 @@ class BabelQueryExpressionParser < BabelBridge::Parser
   end
 
   rule :atom, any(
+    :function,
     :related_count,
     :related_attribute,
     :attribute,
@@ -36,6 +37,24 @@ class BabelQueryExpressionParser < BabelBridge::Parser
     :number,
     :boolean
   )
+
+  rule :function, :attribute, '(', many?(:atom, ','), ')' do
+    def evaluate(scope)
+      if self.respond_to?(attribute.to_sym)
+        self.send(attribute.to_sym, scope, atom)
+      else
+        raise Kaprella::Errors::InvalidFunctionError.new(attribute)
+      end
+    end
+
+    def concat(scope, atoms)
+      atoms = atoms.map { |atom|
+        scope, sql = atom.evaluate(scope)
+        sql
+      }
+      return scope, "concat(#{atoms.join(', ')})"
+    end
+  end
 
   rule :attribute, /[a-zA-Z_]+/ do
     def evaluate(scope)

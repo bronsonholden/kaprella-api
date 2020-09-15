@@ -280,5 +280,42 @@ RSpec.describe BabelQueryExpressionParser do
         expect(generated_value).to eq(count)
       end
     end
+
+    describe 'functions' do
+      let(:generated_value) {
+        generated_scope.first.send(generated_name.to_sym)
+      }
+
+      before(:each) do
+        create :farmer
+      end
+
+      context 'invalid function' do
+        let(:expression) { 'notafunction("a")' }
+        it 'raises error' do
+          expect { generated_value }.to raise_error(Kaprella::Errors::InvalidFunctionError)
+        end
+      end
+
+      describe 'concat' do
+        {
+          'concat("a", "b", "c")' => 'abc',
+          'concat(1, "b", "c")' => '1bc',
+          'concat(concat("a", "b"), "c")' => 'abc',
+          'concat(true, "b")' => 'tb',
+          'concat(true, false, "c")' => 'tfc',
+          'concat(1.5, 2.5)' => '1.52.5',
+          'concat(1e5, "100")' => '100000100',
+          'concat("1e5", "500")' => '1e5500'
+        }.each do |expr, value|
+          context expr do
+            let(:expression) { expr }
+            it 'returns correct value' do
+              expect(generated_value).to eq(value)
+            end
+          end
+        end
+      end
+    end
   end
 end
