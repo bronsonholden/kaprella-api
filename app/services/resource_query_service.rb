@@ -658,7 +658,6 @@ class ResourceQueryService
     end
 
     sorts.each { |sort|
-      sort = URI.decode(sort)
       scope, sql = apply_sort_expression(scope, sort)
       scope = scope.order(Arel.sql("#{sql}"))
     }
@@ -674,7 +673,6 @@ class ResourceQueryService
     end
 
     filters.each { |filter|
-      filter = URI.decode(filter)
       scope, sql = apply_filter_expression(scope, filter)
       scope = scope.where("(#{sql})")
     }
