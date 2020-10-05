@@ -9,6 +9,7 @@ Rails.application.routes.draw do
           :licensors,
           :patents,
           :plant_varieties,
+          :plantings,
           :trademark_names
         ].each { |resource|
           resources resource, path: resource.to_s.camelize(:lower)
